@@ -12,7 +12,7 @@ This repo is adapted from
 
 ## how to
 
-1. Convert the `.seq` video files to `.png` frames by running `$ python generate-images.py`. They will end up in the `images` folder.
+1. Convert the `.tar` files with video to `.png` frames by running `$ ./generate-images.py {path_to_derectory_with_tar_files} {path_to_output} [amount_of_threads]`. This script takes all files from `<path_to_directory_with_tar_files>`, extracts each archive and converts extracted .seq files to `<path_to output>`, finally it removes folders with extracted .seq files. Parallel mode provides way to go through above described flow in regime like "one thread per archive". To enable parallelism need just to specify `<amount_of_threads> as integer value`. The most efficient way is to specify number of threads equal to number of the archives in directory (sure if you have enough cores on CPU).
 3. Squared images work better, which is why you can convert the 640x480 frames to 640x640 frames by running `$ python squarify-images.py`
 3. Convert the `.vbb` annotation files to `.txt` files by running `$ python generate-annotation.py`. It will create the `labels` folder that contains the `.txt` files named like the frames and the `train.txt` and `test.txt` files that contain the paths to the images.
 4. Adjust `.data` yolo file
