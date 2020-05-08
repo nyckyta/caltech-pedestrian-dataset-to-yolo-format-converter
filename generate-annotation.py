@@ -32,14 +32,18 @@ def convertBoxFormat(box, frame_size):
 	h = box_h * dh
 	return (x, y, w, h)
 
-def convert_annotations_to_txt_format(path_to_annotations, output_path, frame_size):
+def create_dir_if_not_exist(dir_path):
+	if not os.path.isdir(dir_path):
+		os.mkdir(dir_path)
+
+def convert_annotations_to_txt_format(path_to_annotations, train_output_directory, test_output_directory, frame_size):
 	# traverse sets
-	squared = default_frame_size == frame_size
+	squared = default_frame_size != frame_size
 	number_of_truth_boxes = 0
 
 	datasets = {
-		'train' : open('train' + ('_squared' if squared else '')  + '.txt', 'w'),
-		'test' : open('test' + ('_squared' if squared else '')  + '.txt', 'w')
+		'train' : open(train_output_directory + '/train' + ('_squared' if squared else '')  + '.txt', 'w'),
+		'test' : open(test_output_directory + '/test' + ('_squared' if squared else '')  + '.txt', 'w')
 	}
 
 	if not zp.is_zipfile(path_to_annotations):
@@ -50,7 +54,6 @@ def convert_annotations_to_txt_format(path_to_annotations, output_path, frame_si
 	for caltech_set in sorted(glob.glob('./annotations/set*')):
 		set_nr = os.path.basename(caltech_set).replace('set', '')
 		dataset = 'train' if int(set_nr) < 6 else 'test'
-		set_id = dataset + set_nr
 		print(caltech_set)
 
 		# traverse videos
@@ -80,9 +83,8 @@ def convert_annotations_to_txt_format(path_to_annotations, output_path, frame_si
 					if not labels:
 						continue
 
-					image_id = set_id + '_' + video_id + '_' + str(frame_id)
-					file_name_template = output_path + '/' + image_id + ('_squared' if squared else '')
-					print(dataset)
+					image_id = 'set' + set_nr + '_' + video_id + '_' + str(frame_id)
+					file_name_template = (train_output_directory if dataset == 'train' else test_output_directory) + '/' + image_id + ('_squared' if squared else '')
 					datasets[dataset].write(file_name_template + '.png\n')
 					label_file = open(file_name_template + '.txt', 'w')
 					label_file.write(labels)
@@ -96,16 +98,17 @@ def convert_annotations_to_txt_format(path_to_annotations, output_path, frame_si
 
 
 if __name__ == '__main__':
-	if len(sys.argv) < 3:
-		raise Exception("Need to spesify path to annotations.zip files and output directory which contains images")
+	if len(sys.argv) < 4:
+		raise Exception("Need to spesify path to annotations.zip files and output directories for train and test instances")
 	path_to_archive = sys.argv[1]
-	output_directory = sys.argv[2] #output directory is directory with images
+	train_output_directory = sys.argv[2]
+	test_output_directory = sys.argv[3]
 
-	if not os.path.isdir(output_directory):
-		os.mkdir(output_directory)
-
+	create_dir_if_not_exist(train_output_directory)
+	create_dir_if_not_exist(test_output_directory)
+	
 	frame_size = default_frame_size #default size
-	if len(sys.argv) > 3: #secod argument specifies size of squared image
-		frame_square_length = int(sys.argv[3])
+	if len(sys.argv) > 4: #secod argument specifies size of squared image
+		frame_square_length = int(sys.argv[4])
 		frame_size = (frame_square_length, frame_square_length)
-	convert_annotations_to_txt_format(path_to_archive, output_directory, frame_size)
+	convert_annotations_to_txt_format(path_to_archive, train_output_directory, test_output_directory, frame_size)
