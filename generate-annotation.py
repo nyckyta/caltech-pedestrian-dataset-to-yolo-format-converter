@@ -97,7 +97,7 @@ def convert_annotations_to_txt_format(path_to_annotations, output_path, frame_si
 
 if __name__ == '__main__':
 	if len(sys.argv) < 3:
-		raise Exception("Need to spesify path to annotations.zip files and output directory")
+		raise Exception("Need to spesify path to annotations.zip files and output directory which contains images")
 	path_to_archive = sys.argv[1]
 	output_directory = sys.argv[2] #output directory is directory with images
 
