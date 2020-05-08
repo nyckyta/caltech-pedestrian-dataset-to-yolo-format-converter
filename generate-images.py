@@ -44,13 +44,15 @@ def unpack_and_convert(entry, output_dir, semaphore):
 def convert_data_from_tars_folder(dir_with_tars, output_dir):
 	with os.scandir(dir_with_tars) as entries:
 		for entry in entries:
-			unpack_and_convert(entry, output_dir, None)
+			if entry[-3:] == 'tar':
+				unpack_and_convert(entry, output_dir, None)
 
 def convert_data_from_tars_folder_in_parallel(dir_with_tars, output_dir, semaphore):
 	with os.scandir(dir_with_tars) as entries:
 		for entry in entries:
-			semaphore.acquire()
-			threading.Thread(target=unpack_and_convert, args=(entry, output_dir, semaphore)).start()
+			if entry.name[-3:] == 'tar':
+				semaphore.acquire()
+				threading.Thread(target=unpack_and_convert, args=(entry, output_dir, semaphore)).start()
 
 
 if __name__ == '__main__':
