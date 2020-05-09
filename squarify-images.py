@@ -1,3 +1,5 @@
+#!/bin/python3
+
 from PIL import Image
 from multiprocessing import Pool, TimeoutError
 import glob
