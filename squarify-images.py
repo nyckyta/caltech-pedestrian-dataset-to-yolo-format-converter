@@ -1,7 +1,7 @@
 #!/bin/python3
 
 from PIL import Image
-from multiprocessing import Pool, TimeoutError
+from concurrent.futures import ThreadPoolExecutor
 import glob
 import sys
 import os
@@ -21,8 +21,8 @@ def squarify_image(output_dir, square_side, img_name):
 def squarify_images(dir_with_img, output_dir, square_side, workers=None):
 	if workers != None:
 		for frame in sorted(glob.glob(dir_with_img + '/*.png')):
-			workers.apply_async(squarify_image, (output_dir, square_side, frame))
-		workers.close()
+			workers.submit(squarify_image, output_dir, square_side, frame)
+		workers.shutdown(wait=True)
 	else:
 		for frame in sorted(glob.glob(dir_with_img + '/*.png')):
 			squarify_image(output_dir, square_side, frame)	
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
 	workers = None
 	if len(sys.argv) > 4:
-		workers = Pool(processes=int(sys.argv[4]))	
+		workers = ThreadPoolExecutor(max_workers=int(sys.argv[4]))	
 
 	if not os.path.isdir(out_dir):
 		os.mkdir(out_dir)
