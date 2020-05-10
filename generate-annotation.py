@@ -73,7 +73,7 @@ def convert_annotations_to_txt_format(path_to_annotations, train_output_director
 						pedestrian_id = int(pedestrian_id[0][0]) - 1
 						pedestrian_pos = pedestrian_pos[0].tolist()
 						# class filter and height filter: here example for medium distance
-						if obj_lbl[pedestrian_id] in classes and pedestrian_pos[3] > 30 and pedestrian_pos[3] <= 80:
+						if obj_lbl[pedestrian_id] in classes:
 							class_index = classes.index(obj_lbl[pedestrian_id])
 							yolo_box_format = convertBoxFormat(pedestrian_pos, frame_size)
 							labels += str(class_index) + ' ' + ' '.join([str(n) for n in yolo_box_format]) + '\n'
@@ -85,7 +85,7 @@ def convert_annotations_to_txt_format(path_to_annotations, train_output_director
 
 					image_id = 'set' + set_nr + '_' + video_id + '_' + str(frame_id)
 					file_name_template = (train_output_directory if dataset == 'train' else test_output_directory) + '/' + image_id + ('_squared' if squared else '')
-					datasets[dataset].write(file_name_template + '.png\n')
+					datasets[dataset].write(os.path.abspath(file_name_template + '.png\n'))
 					label_file = open(file_name_template + '.txt', 'w')
 					label_file.write(labels)
 					label_file.close()
